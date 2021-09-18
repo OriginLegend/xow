@@ -214,7 +214,9 @@ void Dongle::handleWlanPacket(const Bytes &packet)
             // They associate, disassociate and associate again during pairing
             // Disassociations happen without triggering EVT_CLIENT_LOST
             case MT_WLAN_DISASSOCIATION:
+                #if IS_PROP_ENABLED(EMPTY_PACKET_DISCONNECT)
                 handleControllerDisconnect(rxWi->wcid);
+                #endif
                 break;
 
             // Reserved frames are used for different purposes
