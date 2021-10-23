@@ -175,6 +175,9 @@ void Dongle::handleControllerPacket(uint8_t wcid, const Bytes &packet)
 
 void Dongle::handleWlanPacket(const Bytes &packet)
 {
+
+    Log::info("DEBUG: Dongle::handleWlanPacket");
+
     // Ignore invalid or empty packets
     if (packet.size() <= sizeof(RxWi) + sizeof(WlanFrame))
     {
@@ -214,6 +217,19 @@ void Dongle::handleWlanPacket(const Bytes &packet)
             // They associate, disassociate and associate again during pairing
             // Disassociations happen without triggering EVT_CLIENT_LOST
             case MT_WLAN_DISASSOCIATION:
+                Log::info("DEBUG: MT_WLAN_DISASSOCIATION");
+                Log::info("DEBUG: WLAN-FRAME: duration: %i", wlanFrame->duration);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.protocolVersion);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.type);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.subtype);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.toDs);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.fromDs);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.moreFragments);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.retry);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.powerManagement);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.moreData);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.protectedFrame);
+                Log::info("DEBUG: WLAN-FRAME-CONTROL: protocolVersion: %i", wlanFrame->frameControl.order);
                 handleControllerDisconnect(rxWi->wcid);
                 break;
 
@@ -243,6 +259,9 @@ void Dongle::handleWlanPacket(const Bytes &packet)
 
 void Dongle::handleBulkData(const Bytes &data)
 {
+
+    Log::info("DEBUG: Dongle::handleBulkData");
+
     // Ignore invalid or empty data
     if (data.size() <= sizeof(RxInfoGeneric) + sizeof(uint32_t))
     {
@@ -265,11 +284,13 @@ void Dongle::handleBulkData(const Bytes &data)
                 break;
 
             case EVT_PACKET_RX:
+                Log::info("DEBUG: info->eventType == EVT_PACKET_RX");
                 handleWlanPacket(packet);
                 break;
 
             case EVT_CLIENT_LOST:
                 // Packet is guaranteed not to be empty
+                Log::info("DEBUG: EVT_CLIENT_LOST");
                 #if IS_PROP_ENABLED(EMPTY_PACKET_DISCONNECT)
                 handleControllerDisconnect(packet[0]);
                 #endif
@@ -283,6 +304,7 @@ void Dongle::handleBulkData(const Bytes &data)
 
         if (info->is80211)
         {
+            Log::info("DEBUG: rxInfo->port == WLAN_PORT");
             handleWlanPacket(packet);
         }
     }
